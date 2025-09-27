@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email AI Prototype</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .email-card { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .high-priority { border-left: 4px solid #e74c3c; }
+        .medium-priority { border-left: 4px solid #f39c12; }
+        .low-priority { border-left: 4px solid #27ae60; }
+        .priority-badge { 
+            padding: 2px 8px; 
+            border-radius: 3px; 
+            color: white;
+            font-size: 12px;
+        }
+        .high-badge { background: #e74c3c; }
+        .medium-badge { background: #f39c12; }
+        .low-badge { background: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Email AI Dashboard</h1>
+        
+        <div>
+            <button onclick="startMonitoring()">Start Monitoring</button>
+            <button onclick="stopMonitoring()">Stop Monitoring</button>
+            <button onclick="processEmails()">Process Latest Emails</button>
+        </div>
+        
+        <div id="status">Status: Ready</div>
+        
+        <div id="emails-container">
+            <h2>Processed Emails</h2>
+            <div id="emails-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let monitoringInterval = null;
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = 'Status: ' + message;
+        }
+        
+        function startMonitoring() {
+            updateStatus('Monitoring started...');
+            fetch('/start_monitoring', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus('Monitoring active');
+                    // Poll for updates
+                    monitoringInterval = setInterval(fetchEmails, 5000);
+                });
+        }
+        
+        function stopMonitoring() {
+            updateStatus('Monitoring stopped');
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+            fetch('/stop_monitoring', { method: 'POST' });
+        }
+        
+        function processEmails() {
+            updateStatus('Processing emails...');
+            fetch('/process_emails', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    displayEmails(data.emails);
+                    updateStatus('Processing complete');
+                });
+        }
+        
+        function fetchEmails() {
+            fetch('/get_emails')
+                .then(response => response.json())
+                .then(data => displayEmails(data.emails));
+        }
+        
+        function displayEmails(emails) {
+            const container = document.getElementById('emails-list');
+            if (!emails || emails.length === 0) {
+                container.innerHTML = '<p>No emails processed yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = emails.map(email => `
+                <div class="email-card ${email.priority.priority_level}-priority">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong>${email.features.sender}</strong>
+                        <span class="priority-badge ${email.priority.priority_level}-badge">
+                            ${email.priority.priority_level.toUpperCase()}
+                        </span>
+                    </div>
+                    <div><strong>Subject:</strong> ${email.features.subject}</div>
+                    <div><strong>Category:</strong> ${email.category}</div>
+                    <div><strong>Summary:</strong> ${email.summary}</div>
+                    <div><strong>Score:</strong> ${email.priority.priority_score}/100</div>
+                    <div><small>${email.priority.llm_reasoning?.substring(0, 100)}...</small></div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
