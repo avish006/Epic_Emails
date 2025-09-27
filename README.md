@@ -8,7 +8,7 @@ An AI powered Email summarization/prioritization tool to help overcome the probl
 ### 1: Download all the files here.
 
 ### 2: Go to your google cloud console.
-1: Create a new project there, configure oauth creds, allow api access to gmail, add a test user's email to get oauth access.  2: A credentials.json will be created download that and put it into your file directory.
+1: Create a new project there, configure oauth creds, allow api access to gmail, add a test user's email to get oauth access.<br>  2: A credentials.json will be created download that and put it into your file directory.
 
 
 ### 3: Create an Openrouter API key & put it in your .env file.
