@@ -17,7 +17,7 @@ An AI powered Email summarization/prioritization tool to help overcome the probl
 
 ### 5: A pop up window of google will appear select to login with same email as added in test users.
 
-## 6: After Logging in the local host window will appear and click on process latest emails.
+### 6: After Logging in the local host window will appear and click on process latest emails.
 
 ### 7: Enjoy 🍻🥂.
 
